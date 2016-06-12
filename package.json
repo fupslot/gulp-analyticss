@@ -1,0 +1,37 @@
+{
+  "name": "gulp-analyticss",
+  "version": "0.0.0",
+  "description": "My tiptop gulp plugin",
+  "license": "MIT",
+  "repository": "fupslot/gulp-analyticss",
+  "author": {
+    "name": "Eugene Brodsky",
+    "email": "fupslot@gmail.com"
+  },
+  "engines": {
+    "node": ">=5.3.0"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "gulpplugin",
+    "gulp",
+    "s3",
+    "analytic",
+    "css",
+    "analyze",
+    "commit",
+    "snapshot"
+  ],
+  "dependencies": {
+    "analyze-css": "^0.12.0",
+    "git-last-commit": "^0.1.1",
+    "gulp-util": "^3.0.7",
+    "knox": "^0.9.2"
+  },
+  "devDependencies": {}
+}
