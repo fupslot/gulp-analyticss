@@ -39,13 +39,13 @@ module.exports = function (opts) {
 	  uploadPath = uploadPath.replace(new RegExp('\\\\', 'g'), '/');
 
 		try {
-			git.getLastCommit((commit) => {
+			git.getLastCommit((err, commit) => {
 				let fileName;
 
-				if (typeof commit === 'string') {
+				if (err || typeof commit === 'string') {
 					fileName = Date.now();
 				} else {
-					fileName = commit.hash;
+					fileName = commit.shortHash;
 				}
 
 				uploadPath = uploadPath.replace(path.basename(uploadPath), fileName + path.extname(uploadPath));
