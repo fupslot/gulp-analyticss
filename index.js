@@ -1,14 +1,16 @@
 'use strict';
+const fs = require('fs');
 const gutil = require('gulp-util');
 const analyzer = require('analyze-css');
 const Transform = require('stream').Transform;
 const knox = require('knox');
 const path = require('path');
-const git = require('git-last-commit');
+const git = require('./lastcommit');
+
+const config = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 
 module.exports = function (opts) {
 	opts = opts || {};
-	opts.aws = opts.aws || {};
 
 	let headers = { 'x-amz-acl': 'public-read' };
 
@@ -29,30 +31,31 @@ module.exports = function (opts) {
 		}
 
 		if (file.isStream()) {
-			cb(new gutil.PluginError('gulp-analycss', 'Streaming not supported'));
+			cb(new gutil.PluginError(config.name, 'Streaming not supported'));
 			return;
 		}
 
+	  let nowMS = Date.now();
 		let client = knox.createClient(opts.aws);
-	  let uploadPath = file.path.replace(path.extname(file.path), '.json');
+
+	  let extname = '.json';
+	  let uploadPath = file.path.replace(path.extname(file.path), extname);
 	  uploadPath = uploadPath.replace(file.base, opts.uploadPath || '');
 	  uploadPath = uploadPath.replace(new RegExp('\\\\', 'g'), '/');
+		uploadPath = uploadPath.replace(path.basename(uploadPath), nowMS + extname);
 
 		try {
 			git.getLastCommit((err, commit) => {
-				let fileName;
 
 				if (err || typeof commit === 'string') {
-					fileName = Date.now();
-				} else {
-					fileName = commit.shortHash;
+					commit = null;
+					let message = `Unable to collect a commit data, ${(err || commit)}`;
+					gutil.log(gutil.colors.yellow(config.name + ' (warning)', message));
 				}
-
-				uploadPath = uploadPath.replace(path.basename(uploadPath), fileName + path.extname(uploadPath));
 
 				new analyzer(file.contents.toString(), opts, (err, results) => {
 					if (err) {
-						cb(new gutil.PluginError('gulp-analyticss', err));
+						cb(new gutil.PluginError(config.name + ' (error)', err));
 						return;
 					}
 
@@ -65,9 +68,10 @@ module.exports = function (opts) {
 
 					client.putBuffer(buffer, uploadPath, headers, (err, res) => {
 		        if (err || res.statusCode !== 200) {
-		          gutil.log(gutil.colors.red('[FAILED]', file.path + " -> " + uploadPath));
+		        	let message = `Upload path: ${uploadPath} code: ${res.statusCode} message: ${res.statusMessage}`;
+		          gutil.log(gutil.colors.red(config.name+' (failed)', message));
 		        } else {
-		          gutil.log(gutil.colors.green('[SUCCESS]', file.path + " -> " + uploadPath));
+		          gutil.log(gutil.colors.green(config.name+' (success)', `Uploaded ${uploadPath}`));
 		          res.resume();
 
 							cb(null, file);
@@ -77,7 +81,7 @@ module.exports = function (opts) {
 				});
 			});
 		} catch (ex) {
-			cb(new gutil.PluginError('gulp-csso', ex));
+			cb(new gutil.PluginError(config.name+' (error)', ex));
 		}
 	};
 
