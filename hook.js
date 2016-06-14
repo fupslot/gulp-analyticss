@@ -45,7 +45,7 @@ program
     // http://stackoverflow.com/questions/20769023/using-nodejs-chmod-777-and-0777
     fs.chmodSync(postCommitHookPath, 0755);
 
-    console.log(colors.green(`${config.name}: Success`));
+    console.log(colors.green(`${config.name}: Install successfully. ${postCommitHookPath}`));
     process.exit(0);
   });
 
@@ -68,7 +68,7 @@ program
     }
 
     fs.unlinkSync(postCommitHookPath);
-    console.log(colors.green(`${config.name}: Success`));
+    console.log(colors.green(`${config.name}: Uninstall successfully. ${postCommitHookPath}`));
     process.exit(0);
 
   });
