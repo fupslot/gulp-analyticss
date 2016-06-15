@@ -37,6 +37,29 @@ gulp.task('analyticss', () => {
 );
 ```
 
+## Post-commit hook
+
+Running `analyticss` task manually could be an inconvenient. A developer can simply forget to do this. Usually, we want this happening automatically, and there is an option for it. 
+
+By default, your git repository provides a post-commit hook. That script gets executed each time a developer commit to a repository.
+
+
+__NOTE:__ Before run install/uninstall script. Make sure you are in the root folder of your repository and `gulp-analyticss` package is installled.
+
+### How to install a `post-commit` hook
+
+```bash
+./node_modules/gulp-analyticss/hook install
+```
+
+### How to uninstall a `post-commit` hook
+
+```bash
+./node_modules/gulp-analyticss/hook uninstall
+```
+
+Use `--debug` option for more info.
+
 
 ## API
 
