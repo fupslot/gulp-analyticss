@@ -11,7 +11,10 @@ $ npm install --save-dev gulp-analyticss
 
 ## Usage
 
-Setup your aws.json file
+### Using Amazon S3
+
+Create `aws.json` file with following structure. Here you have to specify your access keys to Amazon S3 service.
+
 ```jsons
 {
   "key": "<access_key>",
@@ -20,6 +23,10 @@ Setup your aws.json file
 }
 ```
 
+__NOTE:__ Do not forget to add `aws.json` to `.gitignore` file
+
+
+### Setup gulp task
 Add a new task in your `gulpfile.js`
 
 ```js
@@ -36,6 +43,8 @@ gulp.task('analyticss', () => {
 		.pipe(analyticss(options));
 );
 ```
+
+__NOTE:__ Make sure your keep a gulp task name exactly the same as it appears on  the example.
 
 ## Post-commit hook
 
