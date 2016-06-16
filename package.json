@@ -1,22 +1,30 @@
 {
   "name": "gulp-analyticss",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Creates CSS selectors complexity and performance snapshot file and uploads it to S3.",
   "license": "MIT",
-  "repository": "fupslot/gulp-analyticss",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/fupslot/gulp-analyticss.git"
+  },
   "author": {
     "name": "Eugene Brodsky",
     "email": "fupslot@gmail.com"
   },
+  "homepage": "https://github.com/fupslot/gulp-analyticss",
   "engines": {
-    "node": ">=5.3.0"
+    "node": ">=4.4.0"
   },
   "scripts": {
     "test": ""
   },
   "files": [
-    "index.js"
+    "index.js",
+    "lib/lastcommit.js"
   ],
+  "directories": {
+    "lib": "lib"
+  },
   "keywords": [
     "gulpplugin",
     "gulp",
