@@ -1,6 +1,6 @@
 {
   "name": "gulp-analyticss",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Creates CSS selectors complexity and performance snapshot file and uploads it to S3.",
   "license": "MIT",
   "repository": "fupslot/gulp-analyticss",
