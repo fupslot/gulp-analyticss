@@ -12,6 +12,7 @@
     "email": "fupslot@gmail.com"
   },
   "homepage": "https://github.com/fupslot/gulp-analyticss",
+  "main": "index.js",
   "engines": {
     "node": ">=4.4.0"
   },
@@ -20,7 +21,8 @@
   },
   "files": [
     "index.js",
-    "lib/lastcommit.js"
+    "hook.js",
+    "lib/*"
   ],
   "directories": {
     "lib": "lib"
