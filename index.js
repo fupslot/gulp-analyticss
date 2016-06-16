@@ -1,11 +1,12 @@
 'use strict';
+
 const fs = require('fs');
 const gutil = require('gulp-util');
 const analyzer = require('analyze-css');
 const Transform = require('stream').Transform;
 const knox = require('knox');
 const path = require('path');
-const git = require('./lastcommit');
+const git = require('./lib/lastcommit');
 
 const config = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
 

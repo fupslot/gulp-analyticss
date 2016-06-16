@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+'use strict';
+
 const fs = require('fs-extra');
 const path = require('path');
 const colors  = require('colors/safe');
@@ -39,11 +41,23 @@ program
       process.exit(1);
     }
 
-    fs.copySync(postCommitPath, postCommitHookPath);
+    let script = `
+      #!/bin/sh\r\n
+      # Fixes the issue the causes SourceTree to not run the pre-commit hook with the error:
+      # 'env: node: No such file or directory'
+      PATH=$PATH:/usr/local/bin:/usr/local/sbin\n\r
+      # Test prospective commit
+      ./node_modules/.bin/gulp analyticss\n\r
+      exit 0;
+      \n\r`;
+
+    var buffer = new Buffer(script, 'ascii');
+
+    fs.writeFileSync(postCommitHookPath, buffer);
 
     // Leading zero.
     // http://stackoverflow.com/questions/20769023/using-nodejs-chmod-777-and-0777
-    fs.chmodSync(postCommitHookPath, 0755);
+    fs.chmodSync(postCommitHookPath, '0755');
 
     console.log(colors.green(`${config.name}: Install successfully. ${postCommitHookPath}`));
     process.exit(0);
