@@ -1,0 +1,48 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "jasmine": true,
+    "mocha": true
+  },
+
+  "globals": {
+    "angular": true,
+    "inject": true,
+    "_": true,
+    "Promise": true
+  },
+
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+
+  "rules": {
+    "camelcase": [2, {"properties": "always"}],
+
+    "no-unused-vars": 1,
+
+    "dot-notation": [2, {"allowPattern": "^[a-z]+((_|-)?[a-z]+)+$"}],
+
+    // disallow trailing commas in object literals
+    "no-comma-dangle": 0,
+
+    // disallow use of debugger
+    "no-debugger": 0,
+
+    "indent": [2, 2],
+
+    "quotes": [2, "single"],
+
+    "linebreak-style": [2, "unix"],
+
+    "semi": [2, "always"],
+
+    "no-cond-assign": 0,
+
+    "no-console": 1
+  },
+
+  "extends": "eslint:recommended"
+}
