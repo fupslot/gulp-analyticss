@@ -61,6 +61,10 @@ module.exports = function (opts) {
           data.commit = commit;
 
           logger.send(data, file, (err) => {
+            if (err) {
+              gutil.log(config.name, gutil.colors.red(err.message));
+            }
+
             next(null, file);
           });
 
