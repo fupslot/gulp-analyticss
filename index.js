@@ -15,7 +15,7 @@ module.exports = function (opts) {
 
   if (opts.analyticss) {
     logger = require('./lib/analyticssLogger')(opts);
-    gutil.log(config.name, 'use analyticss.io');
+    gutil.log(config.name, `use analyticss.io (${opts.analyticss.origin})`);
   } else if (opts.aws) {
     logger = require('./lib/S3Logger')(opts);
     gutil.log(config.name, 'use Amazon S3');
