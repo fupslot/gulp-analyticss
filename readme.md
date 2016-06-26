@@ -8,22 +8,30 @@
 $ npm install --save-dev gulp-analyticss
 ```
 
+## Configuration file
 
-## Usage
+Create `analyticss.json` file with following structure.
 
-### Using Amazon S3
+__NOTE:__ For security reasons we do not recommend to store this file in a git repository.
 
-Create `aws.json` file with following structure. Here you have to specify your access keys to Amazon S3 service.
-
-```jsons
+```json
 {
-  "key": "<access_key>",
-  "secret": "<secret>",
-  "bucket": "<bucket name>"
+  "aws": {
+    "key": "<access_key>",
+    "secret": "<secret>",
+    "bucket": "<bucket_name>",
+    "uploadPath": "<upload_path>"
+  },
+
+  "analyticss": {
+    "key": "<access_key>",
+    "secret": "<secret>",
+    "applicationId": "<application_id> "
+  }
 }
 ```
 
-__NOTE:__ Do not forget to add `aws.json` to `.gitignore` file
+## Usage
 
 
 ### Setup gulp task
@@ -33,10 +41,7 @@ Add a new task in your `gulpfile.js`
 const gulp = require('gulp');
 const analyticss = require('gulp-analyticss');
 
-const options = {
-	aws: JSON.parse(fs.readFileSync('./aws.json', 'utf8')),
-	uploadPath: '/folder_name_within_a_bucket'
-};
+let options = require('./analyticss.json');
 
 gulp.task('analyticss', () => {
 	gulp.src('dest/file.css')
@@ -48,12 +53,8 @@ __NOTE:__ Make sure your keep a gulp task name exactly the same as it appears on
 
 ## Post-commit hook
 
-Running `analyticss` task manually could be an inconvenient. A developer can simply forget to do this. Usually, we want this happening automatically, and there is an option for it. 
-
-By default, your git repository provides a post-commit hook. That script gets executed each time a developer commit to a repository.
 
 
-__NOTE:__ Before run install/uninstall script. Make sure you are in the root folder of your repository and `gulp-analyticss` package is installled.
 
 ### How to install a `post-commit` hook
 
@@ -69,12 +70,6 @@ __NOTE:__ Before run install/uninstall script. Make sure you are in the root fol
 
 Use `--debug` option for more info.
 
-
-## API
-
-#### options.uploadPath
-
-Type: `string`<br>
 
 
 

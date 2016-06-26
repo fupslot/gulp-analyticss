@@ -4,87 +4,76 @@ const fs = require('fs');
 const gutil = require('gulp-util');
 const analyzer = require('analyze-css');
 const Transform = require('stream').Transform;
-const knox = require('knox');
-const path = require('path');
 const git = require('./lib/lastcommit');
 
-const config = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+const config = require('./package.json');
 
 module.exports = function (opts) {
-	opts = opts || {};
+  opts = opts || {};
 
-	let headers = { 'x-amz-acl': 'public-read' };
+  let logger;
 
-  headers['Content-Type'] = 'application/json; charset=utf8';
-
-  if (opts.headers) {
-    for (let key in opts.headers) {
-      headers[key] = opts.headers[key];
-    }
+  if (opts.analyticss) {
+    logger = require('./lib/analyticssLogger')(opts);
+    gutil.log(config.name, `use analyticss.io (${opts.analyticss.origin})`);
+  } else if (opts.aws) {
+    logger = require('./lib/S3Logger')(opts);
+    gutil.log(config.name, 'use Amazon S3');
+  } else {
+    gutil.log(config.name, gutil.colors.red(`wrong configuration file`));
+    gutil.log(config.name, gutil.colors.red(`see ${config.homepage} for more details`));
+    process.exit(1);
   }
 
-	var stream = new Transform({ objectMode: true });
 
-	stream._transform = (file, encoding, cb) => {
-		if (file.isNull()) {
-			cb(null, file);
-			return;
-		}
+  // TODO:
+  // let stream = new Stream(logger);
 
-		if (file.isStream()) {
-			cb(new gutil.PluginError(config.name, 'Streaming not supported'));
-			return;
-		}
+  var stream = new Transform({ objectMode: true });
 
-	  let nowMS = Date.now();
-		let client = knox.createClient(opts.aws);
+  stream._transform = (file, encoding, next) => {
+    if (file.isNull()) {
+      cb(null, file);
+      return;
+    }
 
-	  let extname = '.json';
-	  let uploadPath = file.path.replace(path.extname(file.path), extname);
-	  uploadPath = uploadPath.replace(file.base, opts.uploadPath || '');
-	  uploadPath = uploadPath.replace(new RegExp('\\\\', 'g'), '/');
-		uploadPath = uploadPath.replace(path.basename(uploadPath), nowMS + extname);
+    if (file.isStream()) {
+      cb(new gutil.PluginError(config.name, 'Streaming not supported'));
+      return;
+    }
 
-		try {
-			git.getLastCommit((err, commit) => {
+    try {
+      git.getLastCommit((err, commit) => {
 
-				if (err || typeof commit === 'string') {
-					commit = null;
-					let message = `Unable to collect a commit data, ${(err || commit)}`;
-					gutil.log(gutil.colors.yellow(config.name + ' (warning)', message));
-				}
+        if (err || typeof commit === 'string') {
+          commit = null;
+          let message = `Unable to collect a commit data, ${(err || commit)}`;
+          gutil.log(config.name, gutil.colors.red(message));
+        }
 
-				new analyzer(file.contents.toString(), opts, (err, results) => {
-					if (err) {
-						cb(new gutil.PluginError(config.name + ' (error)', err));
-						return;
-					}
+        new analyzer(file.contents.toString(), opts, (err, data) => {
+          if (err) {
+            cb(new gutil.PluginError(config.name + ' (error)', err));
+            return;
+          }
 
-					results.created = Date.now();
-					results.commit = commit;
+          data.created = Date.now();
+          data.commit = commit;
 
-					let buffer = new Buffer(JSON.stringify(results), 'utf8');
+          logger.send(data, file, (err) => {
+            if (err) {
+              gutil.log(config.name, gutil.colors.red(err.message));
+            }
 
-					headers['Content-Length'] = buffer.length;
+            next(null, file);
+          });
 
-					client.putBuffer(buffer, uploadPath, headers, (err, res) => {
-		        if (err || res.statusCode !== 200) {
-		        	let message = `Upload path: ${uploadPath} code: ${res.statusCode} message: ${res.statusMessage}`;
-		          gutil.log(gutil.colors.red(config.name+' (failed)', message));
-		        } else {
-		          gutil.log(gutil.colors.green(config.name+' (success)', `Uploaded ${uploadPath}`));
-		          res.resume();
+        });
+      });
+    } catch (ex) {
+      cb(new gutil.PluginError(config.name+' (error)', ex));
+    }
+  };
 
-							cb(null, file);
-		        }
-		      });
-
-				});
-			});
-		} catch (ex) {
-			cb(new gutil.PluginError(config.name+' (error)', ex));
-		}
-	};
-
-	return stream;
+  return stream;
 };
